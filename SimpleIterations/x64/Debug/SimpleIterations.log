@@ -1,0 +1,3 @@
+﻿  main.cpp
+F:\VisualStudio_Projects\SimpleIterations\SimpleIterations\main.cpp(317,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  SimpleIterations.vcxproj -> F:\VisualStudio_Projects\SimpleIterations\x64\Debug\SimpleIterations.exe
