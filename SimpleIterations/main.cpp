@@ -81,7 +81,7 @@ int main()
 		}
 	}
 
-	while (abs(Nevyazka) > 1)//(Epsilon + (Epsilon * 100)))
+	while (abs(Nevyazka) > 0.5)//(Epsilon + (Epsilon * 100)))
 	{
 		tries++;
 		system("CLS");
@@ -90,9 +90,9 @@ int main()
 			for (int j = 0; j < elements_counter + 1; j++)
 			{
 				matrixA[i][j] = Original_matrix[i][j];
-				cout << setw(10) << matrixA[i][j] << " ";
+				cout << setw(20) << matrixA[i][j] << " ";
 			}
-			cout << setw(10) << matrixB[i] << endl;
+			cout << setw(20) << matrixB[i] << endl;
 		}
 		// Приведение к диагональному преобладанию
 		Diagonal(matrixA, matrixB, elements_counter + 1);
@@ -101,9 +101,9 @@ int main()
 		{
 			for (int j = 0; j < elements_counter + 1; j++)
 			{
-				cout << setw(10) << matrixA[i][j] << " ";
+				cout << setw(20) << matrixA[i][j] << " ";
 			}
-			cout << fixed << setw(10) << matrixB[i] / matrixA[i][i] << endl;
+			cout << fixed << setw(20) << matrixB[i] / matrixA[i][i] << endl;
 		}
 		cout << endl;
 
@@ -122,11 +122,11 @@ int main()
 					SumA += abs(matrixA[i][j] / matrixA[i][i]);
 					SumB += abs(matrixA[j][i] / matrixA[j][j]);
 					gamma += (matrixA[i][j] / matrixA[i][i]) * (matrixA[i][j] / matrixA[i][i]);
-					cout << fixed << setw(10) << matrixA[i][j] / matrixA[i][i];
+					cout << fixed << setw(20) << matrixA[i][j] / matrixA[i][i];
 				}
-				else cout << setw(10) << 0;
+				else cout << setw(20) << 0;
 			}
-			cout << fixed << setw(10) << matrixB[i] / matrixA[i][i] << endl;
+			cout << fixed << setw(20) << matrixB[i] / matrixA[i][i] << endl;
 
 			if (SumA > alpha)
 			{
@@ -149,7 +149,8 @@ int main()
 		if ((alpha < beta) && (alpha < gamma))
 		{
 			cout << "Using alpha" << endl;
-			abg = 0;
+			if (alpha > 0.9) abg = -1;
+			else abg = 0;
 			while (true)
 			{
 				for (int i = 0; i < elements_counter + 1; i++)
@@ -170,7 +171,8 @@ int main()
 		else if ((beta < alpha) && (beta < gamma))
 		{
 			cout << "Using beta" << endl;
-			abg = 1;
+			if (beta > 0.9) abg = -1;
+			else abg = 1;
 			while (true)
 			{
 				for (int i = 0; i < elements_counter + 1; i++)
@@ -187,7 +189,8 @@ int main()
 		else
 		{
 			cout << "Using gamma" << endl;
-			abg = 2;
+			if (gamma > 0.9) abg = -1;
+			else abg = 2;
 			while (true)
 			{
 				for (int i = 0; i < elements_counter + 1; i++)
@@ -205,74 +208,79 @@ int main()
 
 		cout << "k = " << k << endl;
 
-		// Проведение итераций
-		double* result = new double[elements_counter + 1];
-		double* r = new double[elements_counter + 1];
-		result = Iteration(matrixA, matrixB, k, elements_counter + 1);
+		if (abg != -1)
+		{
+			// Проведение итераций
+			double* result = new double[elements_counter + 1];
+			double* r = new double[elements_counter + 1];
+			result = Iteration(matrixA, matrixB, k, elements_counter + 1);
 
-		// Подсчет невязки
-		cout << "r:" << endl;
-		for (int i = 0; i < elements_counter + 1; i++)
-		{
-			r[i] = 0;
-			for (int j = 0; j < elements_counter + 1; j++)
-			{
-				r[i] += Original_matrix[i][j] * result[j];
-			}
-			r[i] -= matrixB[i];
-			cout << setw(10) << setprecision(15) << r[i] << endl;
-		}
-
-		Nevyazka = 0.;
-		switch (abg)
-		{
-		case 0:
-		{
-			if (alpha < 0 || alpha >= 1)
-			{
-				Nevyazka = 10;
-				break;
-			}
+			// Подсчет невязки
+			cout << "r:" << endl;
 			for (int i = 0; i < elements_counter + 1; i++)
 			{
-				if (abs(Nevyazka) < abs(r[i])) Nevyazka = abs(r[i]);
+				r[i] = 0;
+				for (int j = 0; j < elements_counter + 1; j++)
+				{
+					r[i] += Original_matrix[i][j] * result[j];
+				}
+				r[i] -= matrixB[i];
+				cout << setw(20) << setprecision(15) << r[i] << endl;
 			}
-			break;
-		}
-		case 1:
-		{
-			if (beta < 0 || beta >= 1)
+
+			Nevyazka = 0.;
+			switch (abg)
 			{
-				Nevyazka = 10;
+			case 0:
+			{
+				if (alpha < 0 || alpha >= 1)
+				{
+					Nevyazka = 10;
+					break;
+				}
+				for (int i = 0; i < elements_counter + 1; i++)
+				{
+					if (abs(Nevyazka) < abs(r[i])) Nevyazka = abs(r[i]);
+				}
 				break;
 			}
-			for (int i = 0; i < elements_counter + 1; i++)
+			case 1:
 			{
-				Nevyazka += r[i];
-			}
-			break;
-		}
-		case 2:
-		{
-			if (gamma < 0 || gamma >= 1)
-			{
-				Nevyazka = 10;
+				if (beta < 0 || beta >= 1)
+				{
+					Nevyazka = 10;
+					break;
+				}
+				for (int i = 0; i < elements_counter + 1; i++)
+				{
+					Nevyazka += r[i];
+				}
 				break;
 			}
-			for (int i = 0; i < elements_counter + 1; i++)
+			case 2:
 			{
-				Nevyazka += pow(r[i], 2);
+				if (gamma < 0 || gamma >= 1)
+				{
+					Nevyazka = 10;
+					break;
+				}
+				for (int i = 0; i < elements_counter + 1; i++)
+				{
+					Nevyazka += pow(r[i], 2);
+				}
+				Nevyazka = sqrt(Nevyazka);
+				break;
 			}
-			Nevyazka = sqrt(Nevyazka);
-			break;
+			}
+
+			cout << "r = " << Nevyazka << endl;
+
+			if (Nevyazka != Nevyazka) Nevyazka = 10;
+
+			delete[] result;
 		}
-		}
+		else Nevyazka = 10;
 
-		cout << "r = " << Nevyazka << endl;
-
-		if (Nevyazka != Nevyazka) Nevyazka = 10;
-
-		delete[] result;
 	}
 
 	cout << "tries = " << tries;
@@ -334,6 +342,10 @@ void Diagonal(double** matrixA, double* matrixB, int size)
 		{
 			Sum = 0;
 			int row = rand() % size;
+			while (row == i)
+			{
+				row = rand() % size;
+			}
 			double multiplier = low + (double)rand() * (high - low) / RAND_MAX;
 
 			for (int j = 0; j < size; j++)
@@ -365,8 +377,8 @@ void Diagonal(double** matrixA, double* matrixB, int size)
 				}
 				matrixB[i] = ResetB[i];
 				tries = 0;
-				low = rand() % 100 * (-1);
-				high = rand() % 100;
+				low = rand() % 10 * (-1);
+				high = rand() % 10;
 				//cout << "ResetA" << endl;
 				calculations.clear();
 			}
